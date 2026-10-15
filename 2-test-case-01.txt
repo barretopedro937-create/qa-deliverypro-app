@@ -1,0 +1,10 @@
+[ CASO DE TESTE ]
+ID: CT-___ | Requisito/Critério Alvo: __________________
+Pré-condição: Aplicação aberta no navegador Google Chrome.
+
+Passos de Execução:
+1.
+2.
+3.
+
+Resultado Esperado:
