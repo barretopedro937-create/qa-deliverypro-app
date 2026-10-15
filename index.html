@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-width=1.0">
+    <title>DeliveryPro - App de Pedidos</title>
+    <style>
+        :root {
+            --primary: #e74c3c;
+            --secondary: #2c3e50;
+            --success: #27ae60;
+            --warning: #f1c40f;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            color: var(--secondary);
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-info h4 {
+            margin: 0 0 5px 0;
+            color: var(--dark);
+        }
+
+        .item-info p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            margin-top: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .qty-input {
+            width: 80px !important;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        
+        .btn-cupom {
+            background-color: var(--warning);
+            color: var(--warning);
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        
+        .btn-finalizar {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            pointer-events: none;
+        }
+
+        .resumo-valores {
+            background-color: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .linha-valor {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .total-destaque {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--primary);
+            border-top: 2px solid #ccc;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .feedback-section {
+            text-align: center;
+        }
+
+        .stars {
+            font-size: 30px;
+            color: var(--warning);
+            cursor: pointer;
+            margin: 15px 0;
+        }
+
+        
+        #modalSucesso {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 999;
+        }
+
+        .modal-content {
+            background: white;
+            width: 400px;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .modal-content h2 { color: var(--success); }
+        .modal-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 20px; }
+
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>DeliveryPro Express</h1>
+    </header>
+
+    <div class="container">
+        
+        <main class="produtos">
+            <div class="card">
+                <h3>Nosso Cardápio</h3>
+                
+                <div class="menu-item">
+                    <div class="item-info">
+                        <h4>X-Burger Duplo Premium</h4>
+                        <p>Blend 200g, queijo cheddar, bacon artesanal.</p>
+                        <p><strong>R$ 35,00</strong></p>
+                    </div>
+                    
+                    <input type="text" id="qtdItem1" class="qty-input" value="0">
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-info">
+                        <h4>Batata Rústica Grande</h4>
+                        <p>Acompanha maionese da casa.</p>
+                        <p><strong>R$ 18,00</strong></p>
+                    </div>
+                    <input type="number" id="qtdItem2" class="qty-input" value="0">
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-info">
+                        <h4>Refrigerante Lata 350ml</h4>
+                        <p>Bebida gelada.</p>
+                        <p><strong>R$ 7,00</strong></p>
+                    </div>
+                    <input type="number" id="qtdItem3" class="qty-input" value="0">
+                </div>
+            </div>
+
+            <div class="card feedback-section">
+                <h3>Feedback Loop</h3>
+                <p>Avalie sua última experiência conosco:</p>
+                <div class="stars">★★★★★</div>
+                
+                <textarea rows="3" style="width: 100%; border-radius: 6px; padding: 10px;" placeholder="Deixe seu fedback e sugestões aqui..."></textarea>
+            </div>
+        </main>
+
+        <aside class="checkout-panel">
+            <div class="card">
+                <h3>Dados da Entrega</h3>
+                <div style="margin-bottom: 15px;">
+                    <label>Nome Completo:</label>
+                    <input type="text" id="nomeCliente" placeholder="Quem vai receber?">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <!-- ERRO DE GRAMÁTICA 2 -->
+                    <label>Endereço de Entraga:</label>
+                    <input type="text" id="endereco" placeholder="Rua e Número">
+                </div>
+                <div>
+                    <label>Bairro:</label>
+                    <select id="bairroSelect">
+                        <option value="Boa Viagem">Boa Viagem</option>
+                        <option value="Santo Amaro">Santo Amaro</option>
+                        <option value="Casa Amarela">Casa Amarela</option>
+                        <option value="Derby">Derby</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Pagamento</h3>
+                <div>
+                    <label>Cupom de Desconto:</label>
+                    <input type="text" id="cupomInput" placeholder="Ex: SENAC20">
+                    <button class="btn-cupom" onclick="aplicarCupom()">Validar Cupom</button>
+                </div>
+
+                <div class="resumo-valores">
+                    <div class="linha-valor">
+                        <span>Subtotal Itens:</span>
+                        <span id="displaySubtotal">R$ 0.00</span>
+                    </div>
+                    <div class="linha-valor" style="color: #c0392b;">
+                        <span>Taxa de Entrega:</span>
+                        <span>R$ 8.00</span>
+                    </div>
+                    <div class="linha-valor total-destaque">
+                        <span>Total:</span>
+                        <span id="displayTotal">R$ 0.00</span>
+                    </div>
+                </div>
+
+                
+                <button class="btn-finalizar" onclick="finalizarPedido()">Finalizar Carinho</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <div id="modalSucesso">
+        <div class="modal-content">
+            <h2>Pedido Confirmado!</h2>
+            <p id="mensagemModal"></p>
+            <p>Tempo estimado de entrega: <strong>45 minutos</strong></p>
+            <button class="modal-btn" onclick="fecharModal()">Concluir</button>
+        </div>
+    </div>
+
+    <script>
+        let totalCalculado = 0;
+
+        function calcularCarrinho() {
+            let q1 = document.getElementById("qtdItem1").value;
+            let q2 = document.getElementById("qtdItem2").value;
+            let q3 = document.getElementById("qtdItem3").value;
+            
+            let preco1 = 35.00;
+            let preco2 = 18.00;
+            let preco3 = 7.00;
+
+            let subtotal = (q1 * preco1) + (q2 * preco2) + (q3 * preco3);
+            
+            
+            let taxaEntrega = "8.00";
+
+            
+            totalCalculado = subtotal + taxaEntrega;
+
+            document.getElementById("displaySubtotal").innerText = "R$ " + subtotal.toFixed(2);
+            document.getElementById("displayTotal").innerText = "R$ " + totalCalculado;
+        }
+
+        function aplicarCupom() {
+            let cupom = document.getElementById("cupomInput").value;
+            
+            if(cupom === "SENAC20") {
+                
+                totalCalculado = totalCalculado * 20; 
+                document.getElementById("displayTotal").innerText = "R$ " + totalCalculado;
+                alert("Cupom aplicado com sucesso!");
+            } else {
+                alert("Cupom inválido!");
+            }
+        }
+
+        function finalizarPedido() {
+            let nome = document.getElementById("nomeCliente").value;
+            let bairro = document.getElementById("bairroSelect").value;
+            let totalDisplay = document.getElementById("displayTotal").innerText;
+
+            
+            
+            let mensagem = "Obrigado, " + nome + "!\nSeu pedido será entregue em " + bairro + ".\nValor final cobrado: " + totalDisplay;
+            document.getElementById("mensagemModal").innerText = mensagem;
+            document.getElementById("modalSucesso").style.display = "block";
+        }
+
+        function fecharModal() {
+            document.getElementById("modalSucesso").style.display = "none";
+        }
+
+        document.getElementById("qtdItem1").addEventListener("input", calcularCarrinho);
+        document.getElementById("qtdItem2").addEventListener("input", calcularCarrinho);
+        document.getElementById("qtdItem3").addEventListener("input", calcularCarrinho);
+    </script>
+
+</body>
+</html>
