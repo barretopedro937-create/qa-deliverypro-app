@@ -97,7 +97,7 @@
             font-weight: bold;
         }
 
-        
+        /* DEFEITO 1: CSS - O botão de cupom está invisível porque texto e fundo têm a mesma cor */
         .btn-cupom {
             background-color: var(--warning);
             color: var(--warning);
@@ -110,7 +110,7 @@
             font-weight: bold;
         }
 
-        
+        /* DEFEITO 2: CSS - O botão principal de checkout está bloqueado para cliques */
         .btn-finalizar {
             background-color: var(--success);
             color: white;
@@ -161,7 +161,7 @@
             margin: 15px 0;
         }
 
-        
+        /* Estilos do Modal de Confirmação */
         #modalSucesso {
             display: none;
             position: fixed;
@@ -205,7 +205,7 @@
                         <p>Blend 200g, queijo cheddar, bacon artesanal.</p>
                         <p><strong>R$ 35,00</strong></p>
                     </div>
-                    
+                    <!-- DEFEITO 3: O input principal de quantidade é do tipo "text", permitindo que o usuário digite letras como "A" ou símbolos -->
                     <input type="text" id="qtdItem1" class="qty-input" value="0">
                 </div>
 
@@ -232,7 +232,7 @@
                 <h3>Feedback Loop</h3>
                 <p>Avalie sua última experiência conosco:</p>
                 <div class="stars">★★★★★</div>
-                
+                <!-- ERRO DE GRAMÁTICA 1 -->
                 <textarea rows="3" style="width: 100%; border-radius: 6px; padding: 10px;" placeholder="Deixe seu fedback e sugestões aqui..."></textarea>
             </div>
         </main>
@@ -283,13 +283,14 @@
                     </div>
                 </div>
 
-                
+                <!-- ERRO DE GRAMÁTICA 3 -->
                 <button class="btn-finalizar" onclick="finalizarPedido()">Finalizar Carinho</button>
             </div>
         </aside>
 
     </div>
 
+    <!-- Modal que será acionado caso passe no Teste de Aceitação E2E -->
     <div id="modalSucesso">
         <div class="modal-content">
             <h2>Pedido Confirmado!</h2>
@@ -300,49 +301,89 @@
     </div>
 
     <script>
-        let totalCalculado = 0;
+        // ==========================================
+        // MÓDULO 1: LÓGICA PURA (Alvo de Teste Unitário)
+        // Estas funções não acessam o HTML. Elas só fazem matemática.
+        // Podem ser testadas no Console apertando F12.
+        // ==========================================
 
-        function calcularCarrinho() {
-            let q1 = document.getElementById("qtdItem1").value;
-            let q2 = document.getElementById("qtdItem2").value;
-            let q3 = document.getElementById("qtdItem3").value;
-            
-            let preco1 = 35.00;
-            let preco2 = 18.00;
-            let preco3 = 7.00;
+        function calcularSubtotal(q1, preco1, q2, preco2, q3, preco3) {
+            // Regra de prevenção contra valores negativos
+            q1 = q1 < 0 ? 0 : q1;
+            q2 = q2 < 0 ? 0 : q2;
+            q3 = q3 < 0 ? 0 : q3;
 
-            let subtotal = (q1 * preco1) + (q2 * preco2) + (q3 * preco3);
-            
-            
-            let taxaEntrega = "8.00";
-
-            
-            totalCalculado = subtotal + taxaEntrega;
-
-            document.getElementById("displaySubtotal").innerText = "R$ " + subtotal.toFixed(2);
-            document.getElementById("displayTotal").innerText = "R$ " + totalCalculado;
+            return (q1 * preco1) + (q2 * preco2) + (q3 * preco3);
         }
 
-        function aplicarCupom() {
-            let cupom = document.getElementById("cupomInput").value;
+        function calcularTotalFinal(subtotal, taxaEntrega, cupom) {
+            let total = subtotal + taxaEntrega;
             
-            if(cupom === "SENAC20") {
-                
-                totalCalculado = totalCalculado * 20; 
-                document.getElementById("displayTotal").innerText = "R$ " + totalCalculado;
-                alert("Cupom aplicado com sucesso!");
-            } else {
-                alert("Cupom inválido!");
+            // Regra de negócio do desconto
+            if (cupom === "SENAC20") {
+                total = total * 0.80; // Dá 20% de desconto real
             }
+            
+            return total;
         }
+
+        // ==========================================
+        // MÓDULO 2: INTEGRAÇÃO (Lógica + Interface HTML)
+        // Alvo do Teste de Integração
+        // ==========================================
+
+        function atualizarCarrinho() {
+            // 1. Coleta dados do HTML
+            let qtd1 = parseInt(document.getElementById("qtdItem1").value) || 0;
+            let qtd2 = parseInt(document.getElementById("qtdItem2").value) || 0;
+            let qtd3 = parseInt(document.getElementById("qtdItem3").value) || 0;
+            let cupom = document.getElementById("cupomInput").value.toUpperCase();
+            
+            let p1 = 35.00;
+            let p2 = 18.00;
+            let p3 = 7.00;
+            let taxaEntrega = 8.00; // Correção do defeito: agora é número (float) e não string
+
+            // 2. Chama as funções Unitárias
+            let subtotal = calcularSubtotal(qtd1, p1, qtd2, p2, qtd3, p3);
+            
+            // Se o subtotal for 0, não cobra taxa de entrega
+            let taxaAplicada = subtotal > 0 ? taxaEntrega : 0;
+            
+            let totalFinal = calcularTotalFinal(subtotal, taxaAplicada, cupom);
+
+            // 3. Integra o resultado de volta no HTML
+            document.getElementById("displaySubtotal").innerText = "R$ " + subtotal.toFixed(2);
+            document.getElementById("displayTotal").innerText = "R$ " + totalFinal.toFixed(2);
+        }
+
+        // Esta função foi extraída apenas para vincular ao botão de cupom da interface
+        function aplicarCupom() {
+            atualizarCarrinho();
+            alert("Cupom processado!");
+        }
+
+        // ==========================================
+        // MÓDULO 3: VALIDAÇÃO DE ACEITAÇÃO E E2E
+        // ==========================================
 
         function finalizarPedido() {
             let nome = document.getElementById("nomeCliente").value;
             let bairro = document.getElementById("bairroSelect").value;
             let totalDisplay = document.getElementById("displayTotal").innerText;
+            
+            // Validações das Regras de Negócio (Critérios de Aceitação)
+            if (nome.trim() === "") {
+                alert("Falha de Validação: O nome do cliente é obrigatório.");
+                return;
+            }
+            
+            if (totalDisplay === "R$ 0.00") {
+                alert("Falha de Validação: O carrinho não pode estar vazio.");
+                return;
+            }
 
-            
-            
+            // Sucesso
             let mensagem = "Obrigado, " + nome + "!\nSeu pedido será entregue em " + bairro + ".\nValor final cobrado: " + totalDisplay;
             document.getElementById("mensagemModal").innerText = mensagem;
             document.getElementById("modalSucesso").style.display = "block";
@@ -352,9 +393,10 @@
             document.getElementById("modalSucesso").style.display = "none";
         }
 
-        document.getElementById("qtdItem1").addEventListener("input", calcularCarrinho);
-        document.getElementById("qtdItem2").addEventListener("input", calcularCarrinho);
-        document.getElementById("qtdItem3").addEventListener("input", calcularCarrinho);
+        // Escuta a digitação do usuário no navegador para atualizar em tempo real
+        document.getElementById("qtdItem1").addEventListener("input", atualizarCarrinho);
+        document.getElementById("qtdItem2").addEventListener("input", atualizarCarrinho);
+        document.getElementById("qtdItem3").addEventListener("input", atualizarCarrinho);
     </script>
 
 </body>

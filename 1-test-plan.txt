@@ -1,6 +1,0 @@
-[ PLANO DE TESTES - DELIVERYPRO ]
-1. Escopo (O que será testado?): 
-2. Fora de Escopo (O que não será testado?): Banco de dados e Servidor.
-3. Tipos de Teste: ( ) Funcional  ( ) Desempenho  ( ) Usabilidade
-4. Riscos do Sistema: 
-5. Ferramentas e Ambiente:
